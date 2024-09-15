@@ -274,6 +274,7 @@ class Claimer:
                             logger.info(f"{self.session_name} | Got lucky: No")
 
                     spin_updated_at = profile_data.get('spin_updated_at')
+                    print('spin_updated_at: ', spin_updated_at)
 
                     if spin_updated_at == None:
                         spin_updated_atx = 0
@@ -294,7 +295,7 @@ class Claimer:
                                 dtc_amount = value['amount']
 
                         if not dtc_asset == None and dtc_amount > 0:
-                            logger.info(f"{self.session_name} | Sleeping {await asyncio.sleep(delay=self.random_sleep)} before spin to earn")
+                            logger.info(f"{self.session_name} | Sleeping {self.random_sleep} before spin to earn")
                             await asyncio.sleep(delay=self.random_sleep)
 
                             spin_to_earn_response = await self.spin_to_earn(http_client=http_client)
