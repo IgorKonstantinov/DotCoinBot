@@ -233,8 +233,6 @@ class Claimer:
             logger.error(f"{self.session_name} | Proxy: {proxy} | Error: {error}")
 
     async def run(self, proxy: str | None) -> None:
-        access_token_created_time = 0
-
         proxy_conn = ProxyConnector().from_url(proxy) if proxy else None
 
         async with aiohttp.ClientSession(headers=headers, connector=proxy_conn) as http_client:
@@ -277,7 +275,7 @@ class Claimer:
 
                     spin_updated_at = profile_data.get('spin_updated_at')
 
-                    if spin_updated_at == 'None':
+                    if spin_updated_at == None:
                         spin_updated_atx = 0
                     else:
                         spin_updated_atx = int(datetime.fromisoformat(spin_updated_at).timestamp())
@@ -310,14 +308,13 @@ class Claimer:
 
                     while restored_attempt:
                         action = 'daily_attempts'
+                        daily_attempts += 1
                         logger.info(f"{self.session_name} | Restore attempt: {restored_attempt}")
                         logger.success(f"{self.session_name} | action: <red>[{action}]</red> - <c>{daily_attempts}</c>")
-                        daily_attempts += 1
                         restored_attempt = await self.restore_attempt(http_client=http_client)
                         await asyncio.sleep(delay=self.random_sleep)
                     else:
                         logger.info(f"{self.session_name} | Restore attempt: {restored_attempt}")
-                        logger.info(f"{self.session_name} | Minimum attempts reached: {daily_attempts}")
 
                     tasks_data = await self.get_tasks_data(http_client=http_client,
                                                            is_premium=profile_data['is_premium'])
@@ -350,7 +347,7 @@ class Claimer:
                             new_balance = new_balance + taps
 
                         if i > 1:
-                            sleep = randint(*settings.SLEEP_BETWEEN_TAP)
+                            sleep = randint(*settings.RANDOM_SLEEP)
                             logger.info(f"{self.session_name} | Sleep {sleep}s for next tap")
                             await asyncio.sleep(delay=sleep)
 
@@ -411,7 +408,6 @@ class Claimer:
 
 async def run_claimer(tg_client: Client, proxy: str | None):
     while True:
-        logger.info(f"{tg_client.name} | New try")
         try:
             await Claimer(tg_client=tg_client).run(proxy=proxy)
         except InvalidSession:

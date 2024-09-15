@@ -11,9 +11,8 @@ class Settings(BaseSettings):
     AUTO_UPGRADE_ATTEMPTS: bool = True
     MAX_ATTEMPTS_LEVEL: int = 5
 
-    RANDOM_SLEEP: list[int] = [5, 10]
+    RANDOM_SLEEP: list[int] = [15, 30]
     RANDOM_TAPS_COUNT: list[int] = [100, 200]
-    SLEEP_BETWEEN_TAP: list[int] = [15, 30]
     SLEEP_BY_MIN_ATTEMPT: list[int] = [3600, 7200]
     LUCK_AMOUNT: int = 200000
 
