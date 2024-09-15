@@ -1,6 +1,6 @@
 version: '3'
 services:
-  bot:
+  dotcoinbot:
     container_name: 'DotCoinBot'
     build:
       context: .
