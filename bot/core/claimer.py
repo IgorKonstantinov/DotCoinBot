@@ -157,14 +157,14 @@ class Claimer:
             await asyncio.sleep(delay=10)
             return False
 
-    async def save_coins(self, http_client: aiohttp.ClientSession, taps: int) -> bool:
+    async def save_coins(self, http_client: aiohttp.ClientSession, taps: int):
         try:
             logger.info(f"{self.session_name} | bot action: [{inspect.currentframe().f_code.co_name}]")
             response = await http_client.post('https://jjvnmoyncmcewnuykyid.supabase.co/rest/v1/rpc/save_coins',
                                               json={"coins": taps})
             response.raise_for_status()
             response_json = await response.json()
-            return response_json['success']
+            return response_json
 
         except Exception as error:
             logger.error(f"{self.session_name} | Unknown error when saving coins: {error}")
@@ -343,18 +343,22 @@ class Claimer:
                                            f"Task Reward: <g>+{task_reward}</g>")
                             continue
 
-                    for i in range(daily_attempts, 0, -1):
+                    while daily_attempts > 0:
                         taps = randint(*settings.RANDOM_TAPS_COUNT)
-                        status = await self.save_coins(http_client=http_client, taps=taps)
-                        if status:
-                            logger.success(f"{self.session_name} | Successful Tapped! | "
-                                           f"Balance: <c>{new_balance}</c> (<g>+{taps}</g>) | Remaining attempts: <e>{i - 1}</e>")
-                            new_balance = new_balance + taps
-
-                        if i > 1:
+                        save_coins_data = await self.save_coins(http_client=http_client, taps=taps)
+                        if save_coins_data.get('status'):
+                            daily_attempts -= 1
+                            logger.success(f"{self.session_name} | action: <red>[{save_coins}/{taps}/{daily_attempts}]</red> - "
+                                           f"<c>{save_coins_data}</c>")
                             sleep = randint(*settings.RANDOM_SLEEP)
-                            logger.info(f"{self.session_name} | Sleep {sleep}s for next tap")
                             await asyncio.sleep(delay=sleep)
+                        else:
+                            logger.error(
+                                f"{self.session_name} | action: <red>[{save_coins}/{taps}/{daily_attempts}]</red> - "
+                                f"<c>{save_coins_data}</c>")
+                            sleep = randint(*settings.RANDOM_SLEEP)
+                            await asyncio.sleep(delay=sleep)
+                            break
 
                     profile_data = await self.get_profile_data(http_client=http_client)
 
