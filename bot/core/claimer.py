@@ -277,7 +277,7 @@ class Claimer:
                             logger.info(f"{self.session_name} | Got lucky: No")
 
                     spin_updated_at = profile_data.get('spin_updated_at')
-                    print('spin_updated_at: ', spin_updated_at)
+                    #print('spin_updated_at: ', spin_updated_at)
 
                     if spin_updated_at == None:
                         spin_updated_atx = 0
@@ -348,13 +348,13 @@ class Claimer:
                         save_coins_data = await self.save_coins(http_client=http_client, taps=taps)
                         if save_coins_data.get('status'):
                             daily_attempts -= 1
-                            logger.success(f"{self.session_name} | action: <red>[{save_coins}/{taps}/{daily_attempts}]</red> - "
+                            logger.success(f"{self.session_name} | action: <red>[save_coins/{taps}/{daily_attempts}]</red> - "
                                            f"<c>{save_coins_data}</c>")
                             sleep = randint(*settings.RANDOM_SLEEP)
                             await asyncio.sleep(delay=sleep)
                         else:
                             logger.error(
-                                f"{self.session_name} | action: <red>[{save_coins}/{taps}/{daily_attempts}]</red> - "
+                                f"{self.session_name} | action: <red>[save_coins/{taps}/{daily_attempts}]</red> - "
                                 f"<c>{save_coins_data}</c>")
                             sleep = randint(*settings.RANDOM_SLEEP)
                             await asyncio.sleep(delay=sleep)
