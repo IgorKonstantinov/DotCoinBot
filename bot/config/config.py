@@ -7,12 +7,12 @@ class Settings(BaseSettings):
     API_HASH: str
 
     AUTO_UPGRADE_TAP: bool = True
-    MAX_TAP_LEVEL: int = 5
+    MAX_TAP_LEVEL: int = 10
     AUTO_UPGRADE_ATTEMPTS: bool = True
-    MAX_ATTEMPTS_LEVEL: int = 5
+    MAX_ATTEMPTS_LEVEL: int = 10
 
     RANDOM_SLEEP: list[int] = [15, 30]
-    RANDOM_TAPS_COUNT: list[int] = [100, 200]
+    RANDOM_TAPS_COUNT: list[int] = [1000, 2000]
     SLEEP_BY_MIN_ATTEMPT: list[int] = [3600, 7200]
     LUCK_AMOUNT: int = 200000
 
