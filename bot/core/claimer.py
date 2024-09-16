@@ -153,7 +153,10 @@ class Claimer:
 
             if response.ok:
                 response_json = await response.json()
-                if response_json['success'] : return True
+                if response_json['success']:
+                    return True
+                else:
+                    return False
             else:
                 return False
 
