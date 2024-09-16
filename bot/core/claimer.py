@@ -105,6 +105,7 @@ class Claimer:
     async def get_profile_data(self, http_client: aiohttp.ClientSession) -> dict[str]:
         try:
             logger.info(f"{self.session_name} | bot action: [{inspect.currentframe().f_code.co_name}]")
+            await asyncio.sleep(delay=self.random_sleep)
             response = await http_client.post('https://jjvnmoyncmcewnuykyid.supabase.co/rest/v1/rpc/get_user_info',
                                               json={})
             response.raise_for_status()
@@ -118,6 +119,7 @@ class Claimer:
     async def get_tasks_data(self, http_client: aiohttp.ClientSession, is_premium: bool) -> dict[str]:
         try:
             logger.info(f"{self.session_name} | bot action: [{inspect.currentframe().f_code.co_name}]")
+            await asyncio.sleep(delay=self.random_sleep)
             response = await http_client.post('https://jjvnmoyncmcewnuykyid.supabase.co/rest/v1/rpc/get_filtered_tasks',
                                               json={"platform": "android", "locale": "en", "is_premium": is_premium})
             response.raise_for_status()
@@ -132,6 +134,7 @@ class Claimer:
     async def complate_task(self, http_client: aiohttp.ClientSession, task_id: int) -> bool:
         try:
             logger.info(f"{self.session_name} | bot action: [{inspect.currentframe().f_code.co_name}]")
+            await asyncio.sleep(delay=self.random_sleep)
             response = await http_client.post('https://jjvnmoyncmcewnuykyid.supabase.co/rest/v1/rpc/complete_task',
                                               json={"oid": task_id})
             response.raise_for_status()
@@ -168,6 +171,7 @@ class Claimer:
     async def save_coins(self, http_client: aiohttp.ClientSession, taps: int):
         try:
             logger.info(f"{self.session_name} | bot action: [{inspect.currentframe().f_code.co_name}]")
+            await asyncio.sleep(delay=self.random_sleep)
             response = await http_client.post('https://jjvnmoyncmcewnuykyid.supabase.co/rest/v1/rpc/save_coins',
                                               json={"coins": taps})
             response.raise_for_status()
@@ -182,6 +186,7 @@ class Claimer:
     async def try_your_luck(self, http_client: aiohttp.ClientSession, luck_amount: int) -> bool:
         try:
             logger.info(f"{self.session_name} | bot action: [{inspect.currentframe().f_code.co_name}]")
+            await asyncio.sleep(delay=self.random_sleep)
             response = await http_client.post('https://jjvnmoyncmcewnuykyid.supabase.co/rest/v1/rpc/try_your_luck',
                                               json={"coins": luck_amount})
             response.raise_for_status()
@@ -196,6 +201,7 @@ class Claimer:
     async def restore_attempt(self, http_client: aiohttp.ClientSession) -> bool:
         try:
             logger.info(f"{self.session_name} | bot action: [{inspect.currentframe().f_code.co_name}]")
+            await asyncio.sleep(delay=self.random_sleep)
             response = await http_client.post('https://jjvnmoyncmcewnuykyid.supabase.co/rest/v1/rpc/restore_attempt',
                                               json={})
             response.raise_for_status()
@@ -210,6 +216,7 @@ class Claimer:
     async def get_assets(self, http_client: aiohttp.ClientSession) -> dict[str]:
         try:
             logger.info(f"{self.session_name} | bot action: [{inspect.currentframe().f_code.co_name}]")
+            await asyncio.sleep(delay=self.random_sleep)
             response = await http_client.post('https://jjvnmoyncmcewnuykyid.supabase.co/rest/v1/rpc/get_assets',
                                               json={})
             response.raise_for_status()
@@ -223,6 +230,7 @@ class Claimer:
     async def spin_to_earn(self, http_client: aiohttp.ClientSession) -> dict[str]:
         try:
             logger.info(f"{self.session_name} | bot action: [{inspect.currentframe().f_code.co_name}]")
+            await asyncio.sleep(delay=self.random_sleep)
             response = await http_client.post('https://jjvnmoyncmcewnuykyid.supabase.co/rest/v1/rpc/spin_to_win',
                                               json={})
             response.raise_for_status()
@@ -262,7 +270,6 @@ class Claimer:
 
                     http_client.headers["Authorization"] = f"Bearer {access_token}"
                     http_client.headers["X-Telegram-User-Id"] = f"{user_id}"
-                    await asyncio.sleep(delay=self.random_sleep)
 
                     profile_data = await self.get_profile_data(http_client=http_client)
 
@@ -285,7 +292,6 @@ class Claimer:
                             logger.info(f"{self.session_name} | Got lucky: No")
 
                     spin_updated_at = profile_data.get('spin_updated_at')
-                    #print('spin_updated_at: ', spin_updated_at)
 
                     if spin_updated_at == None:
                         spin_updated_atx = 0
@@ -306,9 +312,6 @@ class Claimer:
                                 dtc_amount = value['amount']
 
                         if not dtc_asset == None and dtc_amount > 0:
-                            logger.info(f"{self.session_name} | Sleeping {self.random_sleep} before spin to earn")
-                            await asyncio.sleep(delay=self.random_sleep)
-
                             spin_to_earn_response = await self.spin_to_earn(http_client=http_client)
                             logger.info(f"{self.session_name} | spin_to_earn_response: {spin_to_earn_response}")
 
@@ -317,7 +320,6 @@ class Claimer:
                                             f" {spin_to_earn_response.get('amount')} {spin_to_earn_response.get('symbol')}")
 
                     restored_attempt = await self.restore_attempt(http_client=http_client)
-                    await asyncio.sleep(delay=self.random_sleep)
 
                     while restored_attempt:
                         action = 'daily_attempts'
@@ -325,7 +327,6 @@ class Claimer:
                         logger.info(f"{self.session_name} | Restore attempt: {restored_attempt}")
                         logger.success(f"{self.session_name} | action: <red>[{action}]</red> - <c>{daily_attempts}</c>")
                         restored_attempt = await self.restore_attempt(http_client=http_client)
-                        await asyncio.sleep(delay=self.random_sleep)
                     else:
                         logger.info(f"{self.session_name} | Restore attempt: {restored_attempt}")
 
@@ -358,14 +359,10 @@ class Claimer:
                             daily_attempts -= 1
                             logger.success(f"{self.session_name} | action: <red>[save_coins/{taps}/{daily_attempts}]</red> - "
                                            f"<c>{save_coins_data}</c>")
-                            sleep = randint(*settings.RANDOM_SLEEP)
-                            await asyncio.sleep(delay=sleep)
                         else:
                             logger.error(
                                 f"{self.session_name} | action: <red>[save_coins/{taps}/{daily_attempts}]</red> - "
                                 f"<c>{save_coins_data}</c>")
-                            sleep = randint(*settings.RANDOM_SLEEP)
-                            await asyncio.sleep(delay=sleep)
                             break
 
                     profile_data = await self.get_profile_data(http_client=http_client)
