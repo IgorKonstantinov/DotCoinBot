@@ -346,7 +346,7 @@ class Claimer:
                     while daily_attempts > 0:
                         taps = randint(*settings.RANDOM_TAPS_COUNT)
                         save_coins_data = await self.save_coins(http_client=http_client, taps=taps)
-                        if save_coins_data.get('status'):
+                        if save_coins_data.get('success'):
                             daily_attempts -= 1
                             logger.success(f"{self.session_name} | action: <red>[save_coins/{taps}/{daily_attempts}]</red> - "
                                            f"<c>{save_coins_data}</c>")
