@@ -146,14 +146,19 @@ class Claimer:
     async def upgrade_boosts(self, http_client: aiohttp.ClientSession, boost_type: str, lvl: int) -> bool:
         try:
             logger.info(f"{self.session_name} | bot action: [{inspect.currentframe().f_code.co_name}]")
+            await asyncio.sleep(delay=self.random_sleep)
             response = await http_client.post(f'https://jjvnmoyncmcewnuykyid.supabase.co/rest/v1/rpc/{boost_type}',
                                               json={"lvl": lvl})
             response.raise_for_status()
-            response_json = await response.json()
-            return response_json['success']
+
+            if response.ok:
+                response_json = await response.json()
+                if response_json['success'] : return True
+            else:
+                return False
 
         except Exception as error:
-            logger.error(f"{self.session_name} | Unknown error when complate task: {error}")
+            logger.error(f"{self.session_name} | Unknown error when upgrade_boosts: {error}")
             await asyncio.sleep(delay=10)
             return False
 
@@ -372,34 +377,26 @@ class Claimer:
                     next_attempts_lvl = attempts_lvl + 1
                     next_attempts_price = (2 ** attempts_lvl) * 1000
 
-                    if (settings.AUTO_UPGRADE_TAP is True
-                            and balance > next_multiple_price
-                            and next_multiple_lvl <= settings.MAX_TAP_LEVEL):
-                        logger.info(f"{self.session_name} | Sleep {self.random_sleep}s before upgrade tap to {next_multiple_lvl} lvl")
-                        await asyncio.sleep(delay=self.random_sleep)
+                    if settings.AUTO_UPGRADE_TAP and balance > next_multiple_price and next_multiple_lvl <= settings.MAX_TAP_LEVEL:
+                        action = 'add_multitap'
+                        logger.info(f"{self.session_name} | action: <red>[upgrade/{action}]</red> ")
+                        status = await self.upgrade_boosts(http_client=http_client, boost_type=action,lvl=multiple_lvl)
+                        if status:
+                            logger.success(f"{self.session_name} | action: <red>[upgrade/{action}]</red> - <c>{status}</c>")
+                        else:
+                            logger.error(
+                                f"{self.session_name} | action: <red>[upgrade/{action}]</red> - <c>{status}</c>")
 
-                        status = await self.upgrade_boosts(http_client=http_client, boost_type="add_multitap",
-                                                           lvl=multiple_lvl)
-                        if status is True:
-                            logger.success(f"{self.session_name} | Tap upgraded to {next_multiple_lvl} lvl")
-                            await asyncio.sleep(delay=self.random_sleep)
-                        continue
-
-                    if (settings.AUTO_UPGRADE_ATTEMPTS is True
-                            and balance > next_attempts_price
-                            and next_attempts_lvl <= settings.MAX_ATTEMPTS_LEVEL):
-                        logger.info(
-                            f"{self.session_name} | Sleep {self.random_sleep} before upgrade limit attempts to {next_attempts_lvl} lvl")
-                        await asyncio.sleep(delay=self.random_sleep)
-
-                        status = await self.upgrade_boosts(http_client=http_client, boost_type="add_attempts",
-                                                           lvl=attempts_lvl)
-                        if status is True:
-                            new_daily_attempts = next_attempts_lvl + 9
+                    if settings.AUTO_UPGRADE_ATTEMPTS and balance > next_attempts_price and next_attempts_lvl <= settings.MAX_ATTEMPTS_LEVEL:
+                        action = 'add_attempts'
+                        logger.info(f"{self.session_name} | action: <red>[upgrade/{action}]</red> ")
+                        status = await self.upgrade_boosts(http_client=http_client, boost_type=action, lvl=multiple_lvl)
+                        if status:
                             logger.success(
-                                f"{self.session_name} | Limit attempts upgraded to {next_attempts_lvl} lvl (<m>{new_daily_attempts}</m>)")
-                            await asyncio.sleep(delay=self.random_sleep)
-                        continue
+                                f"{self.session_name} | action: <red>[upgrade/{action}]</red> - <c>{status}</c>")
+                        else:
+                            logger.error(
+                                f"{self.session_name} | action: <red>[upgrade/{action}]</red> - <c>{status}</c>")
 
                     logger.info(f"{self.session_name} | Minimum attempts reached: {daily_attempts}")
                     logger.info(f"{self.session_name} | Next try to tap coins in {sleep_by_min_attempt}s")
