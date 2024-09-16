@@ -9,6 +9,7 @@ from random import randint
 from urllib.parse import unquote
 
 import aiohttp
+from aiocfscrape import CloudflareScraper
 from aiohttp_proxy import ProxyConnector
 from better_proxy import Proxy
 from pyrogram import Client
@@ -108,8 +109,8 @@ class Claimer:
                                               json={})
             response.raise_for_status()
             response_json = await response.json()
-
             return response_json
+
         except Exception as error:
             logger.error(f"{self.session_name} | Unknown error when getting Profile Data: {error}")
             await asyncio.sleep(delay=10)
@@ -243,7 +244,9 @@ class Claimer:
                 try:
                     sleep_by_min_attempt = random.randint(*settings.SLEEP_BY_MIN_ATTEMPT)
 
+                    http_client = CloudflareScraper(headers=headers)
                     tg_web_data = await self.get_tg_web_data(proxy=proxy)
+
                     get_token_data = await self.get_token(http_client=http_client,tg_web_data=tg_web_data['tg_web_data'])
                     access_token = get_token_data.get('token')
                     user_id = get_token_data.get('userId')
@@ -302,7 +305,8 @@ class Claimer:
                             logger.info(f"{self.session_name} | spin_to_earn_response: {spin_to_earn_response}")
 
                             if spin_to_earn_response.get('success'):
-                                logger.info(f"{self.session_name} | You won {spin_to_earn_response.get('amount')}")
+                                logger.info(f"{self.session_name} | You won: "
+                                            f" {spin_to_earn_response.get('amount')} {spin_to_earn_response.get('symbol')}")
 
                     restored_attempt = await self.restore_attempt(http_client=http_client)
                     await asyncio.sleep(delay=self.random_sleep)
