@@ -5,7 +5,7 @@ import random
 
 from time import time
 from datetime import datetime, timezone
-from dateutil import parser
+#from dateutil import parser
 from random import randint
 from urllib.parse import unquote
 
@@ -297,13 +297,13 @@ class Claimer:
                     if spin_updated_at == None:
                         spin_updated_atx = 0
                     else:
-                        spin_updated_atx = int(parser.parse(spin_updated_at).timestamp())
+                        #spin_updated_atx = int(parser.parse(spin_updated_at).timestamp())
+                        spin_updated_atx = int(datetime.fromisoformat(spin_updated_at).timestamp())
 
                     current_date_utc = int(datetime.now().astimezone(timezone.utc).timestamp())
 
                     if (spin_updated_atx + 28800) < current_date_utc:
                         asset_data = await self.get_assets(http_client=http_client)
-
                         dtc_asset = None
                         dtc_amount = 0
 
